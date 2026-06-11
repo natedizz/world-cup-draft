@@ -582,7 +582,6 @@ CSS = """
 <style>
 .stApp{background:#070b09}
 header[data-testid="stHeader"]{background:rgba(0,0,0,0)}
-section[data-testid="stSidebar"]{background:#0e1512}
 .stApp, .stMarkdown, .stCaption, p, li, td, th{color:#eef3f0}
 
 :root{--panel:#0e1512;--panel2:#121d18;--line:#22332b;--ink:#eef3f0;--mut:#7d9388;
@@ -671,15 +670,9 @@ border:1px solid #2e4438 !important;font-weight:700 !important;border-radius:9px
 [data-testid="stExpander"] summary span,[data-testid="stExpander"] svg{color:#eef3f0 !important;fill:#eef3f0 !important}
 label, label p, [data-testid="stWidgetLabel"] p{color:#eef3f0 !important}
 .gt{max-width:860px}
-/* make the sidebar open/close toggle clearly visible on mobile */
-[data-testid="stSidebarCollapsedControl"],[data-testid="collapsedControl"],
-button[kind="header"],[data-testid="stSidebarCollapseButton"]{
-background:#16d97e !important;border-radius:9px !important;
-box-shadow:0 2px 10px rgba(0,0,0,.5) !important;opacity:1 !important}
-[data-testid="stSidebarCollapsedControl"] svg,[data-testid="collapsedControl"] svg,
-button[kind="header"] svg,[data-testid="stSidebarCollapseButton"] svg,
-[data-testid="stSidebarCollapsedControl"] *,[data-testid="collapsedControl"] *{
-color:#04130b !important;fill:#04130b !important}
+/* settings + debug expanders: make them obvious and tappable on mobile */
+[data-testid="stExpander"] summary{font-weight:800 !important;font-size:15px !important}
+[data-testid="stExpander"] summary:hover{color:#16d97e !important}
 /* mobile: owners rows collapse to rank · name · total (banked/live move under name) */
 @media(max-width:560px){
   .orow{grid-template-columns:30px 1fr auto !important;gap:9px !important;padding:12px 13px !important}
@@ -738,25 +731,31 @@ def load_matches(demo):
     return matches, unknown, errors
 
 # ------------------------------------------------------------- sidebar
-with st.sidebar:
-    st.markdown("### ⚙️ Settings")
-    demo = st.toggle("Demo mode (sample data)", value=False,
-                     help="Plays one full Elo-simulated tournament (all 104 matches) so every tab is filled out end to end.")
-    if HAS_AR:
-        auto = st.toggle("Auto-refresh", value=True)
-        secs = st.select_slider("Every", options=[30, 60, 120], value=60,
-                                format_func=lambda s: f"{s}s")
-        if auto and not demo:
-            st_autorefresh(interval=secs * 1000, key="ar")
-    btn_label = "🎲 New simulation" if demo else "↻ Refresh data now"
-    if st.button(btn_label, use_container_width=True):
-        if demo:
-            import random as _rnd
-            st.session_state.demo_seed = _rnd.randrange(1, 1_000_000)
+with st.expander("⚙️  Settings & controls", expanded=False):
+    cset = st.columns([1.4, 1.4, 1.2])
+    with cset[0]:
+        demo = st.toggle("Demo mode (sample data)", value=False,
+                         help="Plays one full Elo-simulated tournament (all 104 matches) so every tab is filled out end to end.")
+    with cset[1]:
+        if HAS_AR:
+            auto = st.toggle("Auto-refresh", value=True)
+            secs = st.select_slider("Refresh every", options=[30, 60, 120], value=60,
+                                    format_func=lambda s: f"{s}s")
+            if auto and not demo:
+                st_autorefresh(interval=secs * 1000, key="ar")
         else:
-            fetch_live.clear()
-            fetch_future.clear()
-        st.rerun()
+            auto = False
+    with cset[2]:
+        btn_label = "🎲 New simulation" if demo else "↻ Refresh data now"
+        st.write("")
+        if st.button(btn_label, use_container_width=True):
+            if demo:
+                import random as _rnd
+                st.session_state.demo_seed = _rnd.randrange(1, 1_000_000)
+            else:
+                fetch_live.clear()
+                fetch_future.clear()
+            st.rerun()
 
 matches, unknown_names, fetch_errors = load_matches(demo)
 state = wc.build_state(matches)
@@ -948,15 +947,14 @@ with tab4:
                         f'<th>Live</th><th>Total</th></tr>{rows}</table>', unsafe_allow_html=True)
 
 # ------------------------------------------------------------- debug
-with st.sidebar:
-    with st.expander("🔧 Data debug"):
-        st.write(f"Fixtures parsed: **{len(matches)}**")
-        st.write(f"Completed: **{sum(1 for m in matches if m['completed'])}** · "
-                 f"Live: **{n_live}**")
-        if unknown_names:
-            st.warning("Unmatched team names from ESPN (add to the ALIAS map at the top of this file): "
-                       + ", ".join(unknown_names))
-        if fetch_errors:
-            st.error("\n".join(fetch_errors))
-        if not unknown_names and not fetch_errors:
-            st.write("No name mismatches, no fetch errors. ✓")
+with st.expander("🔧 Data debug"):
+    st.write(f"Fixtures parsed: **{len(matches)}**")
+    st.write(f"Completed: **{sum(1 for m in matches if m['completed'])}** · "
+             f"Live: **{n_live}**")
+    if unknown_names:
+        st.warning("Unmatched team names from ESPN (add to the ALIAS map at the top of this file): "
+                   + ", ".join(unknown_names))
+    if fetch_errors:
+        st.error("\n".join(fetch_errors))
+    if not unknown_names and not fetch_errors:
+        st.write("No name mismatches, no fetch errors. ✓")
