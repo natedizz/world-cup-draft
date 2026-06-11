@@ -654,6 +654,7 @@ padding:2px 5px;border-radius:4px;font-weight:800;margin-left:7px;vertical-align
 .ostat{font-family:Impact,'Arial Narrow',sans-serif;font-size:20px;text-align:right}
 .ostat small{display:block;font-family:system-ui;font-size:9px;color:var(--mut);
 font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.osub{display:none;font-size:11px;color:var(--mut);font-weight:600;margin-top:3px}
 .obar{height:12px;background:#0a120e;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .obar i{display:block;height:100%;border-radius:6px}
 .badge{font-size:9px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:5px}
@@ -670,6 +671,23 @@ border:1px solid #2e4438 !important;font-weight:700 !important;border-radius:9px
 [data-testid="stExpander"] summary span,[data-testid="stExpander"] svg{color:#eef3f0 !important;fill:#eef3f0 !important}
 label, label p, [data-testid="stWidgetLabel"] p{color:#eef3f0 !important}
 .gt{max-width:860px}
+/* make the sidebar open/close toggle clearly visible on mobile */
+[data-testid="stSidebarCollapsedControl"],[data-testid="collapsedControl"],
+button[kind="header"],[data-testid="stSidebarCollapseButton"]{
+background:#16d97e !important;border-radius:9px !important;
+box-shadow:0 2px 10px rgba(0,0,0,.5) !important;opacity:1 !important}
+[data-testid="stSidebarCollapsedControl"] svg,[data-testid="collapsedControl"] svg,
+button[kind="header"] svg,[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="stSidebarCollapsedControl"] *,[data-testid="collapsedControl"] *{
+color:#04130b !important;fill:#04130b !important}
+/* mobile: owners rows collapse to rank · name · total (banked/live move under name) */
+@media(max-width:560px){
+  .orow{grid-template-columns:30px 1fr auto !important;gap:9px !important;padding:12px 13px !important}
+  .colhide{display:none !important}
+  .osub{display:block !important}
+  .ork{font-size:22px !important}
+  .otot{font-size:21px !important}
+}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -901,13 +919,15 @@ with tab4:
         you = '<span class="you">YOU</span>' if o == ME else ""
         b, l, t = state["owner_banked"][o], state["owner_live"][o], state["owner_total"][o]
         lhtml = f'<div class="ostat lvp">+{l:g}<small>live</small></div>' if l else '<div class="ostat" style="color:var(--mut)">—<small>live</small></div>'
+        sub = f'<div class="osub">{b:g} banked' + (f' · <span class="lvp">+{l:g} live</span>' if l else '') + '</div>'
         html += (f'<div class="orow{" me" if o == ME else ""}">'
                  f'<div class="ork">{i + 1}</div>'
                  f'<div class="oname"><span class="dot" style="background:{c}"></span>{o}{you}'
+                 f'{sub}'
                  f'<div class="obar" style="margin-top:7px"><i style="background:{c};width:{t / mx * 100:.1f}%"></i></div></div>'
-                 f'<div class="ostat">{b:g}<small>banked</small></div>'
-                 f'{lhtml}'
-                 f'<div class="ostat" style="color:{c};font-size:24px">{t:g}<small>total</small></div>'
+                 f'<div class="ostat colhide">{b:g}<small>banked</small></div>'
+                 f'{lhtml.replace("ostat", "ostat colhide", 1)}'
+                 f'<div class="ostat otot" style="color:{c};font-size:24px">{t:g}<small>total</small></div>'
                  f'</div>')
     st.markdown(html, unsafe_allow_html=True)
     st.caption("Banked = locked in from finished results and finalized groups. "
