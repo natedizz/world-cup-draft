@@ -472,10 +472,121 @@ ELO = {
     "England": 2055, "Croatia": 1925, "Ghana": 1760, "Panama": 1690,
 }
 
+# real WC2026 fixtures: (group, date, "HH:MM UTC±X", team1_raw, team2_raw)
+# playoff slots use their FIFA path placeholder, mapped below to the qualified team.
+_PLAYOFF = {"UEFA Path D winner": "Czechia", "UEFA Path A winner": "Bosnia",
+            "UEFA Path C winner": "Turkiye", "UEFA Path B winner": "Sweden",
+            "IC Path 2 winner": "Iraq", "IC Path 1 winner": "DR Congo"}
+
+_GROUP_FIXTURES = [
+    ("A", "2026-06-11", "13:00 UTC-6", "Mexico", "South Africa"),
+    ("A", "2026-06-11", "20:00 UTC-6", "South Korea", "UEFA Path D winner"),
+    ("A", "2026-06-18", "12:00 UTC-4", "UEFA Path D winner", "South Africa"),
+    ("A", "2026-06-18", "19:00 UTC-6", "Mexico", "South Korea"),
+    ("A", "2026-06-24", "19:00 UTC-6", "UEFA Path D winner", "Mexico"),
+    ("A", "2026-06-24", "19:00 UTC-6", "South Africa", "South Korea"),
+    ("B", "2026-06-12", "15:00 UTC-4", "Canada", "UEFA Path A winner"),
+    ("B", "2026-06-13", "12:00 UTC-7", "Qatar", "Switzerland"),
+    ("B", "2026-06-18", "12:00 UTC-7", "Switzerland", "UEFA Path A winner"),
+    ("B", "2026-06-18", "15:00 UTC-7", "Canada", "Qatar"),
+    ("B", "2026-06-24", "12:00 UTC-7", "Switzerland", "Canada"),
+    ("B", "2026-06-24", "12:00 UTC-7", "UEFA Path A winner", "Qatar"),
+    ("C", "2026-06-13", "18:00 UTC-4", "Brazil", "Morocco"),
+    ("C", "2026-06-13", "21:00 UTC-4", "Haiti", "Scotland"),
+    ("C", "2026-06-19", "18:00 UTC-4", "Scotland", "Morocco"),
+    ("C", "2026-06-19", "21:00 UTC-4", "Brazil", "Haiti"),
+    ("C", "2026-06-24", "18:00 UTC-4", "Scotland", "Brazil"),
+    ("C", "2026-06-24", "18:00 UTC-4", "Morocco", "Haiti"),
+    ("D", "2026-06-12", "18:00 UTC-7", "USA", "Paraguay"),
+    ("D", "2026-06-13", "21:00 UTC-7", "Australia", "UEFA Path C winner"),
+    ("D", "2026-06-19", "12:00 UTC-7", "USA", "Australia"),
+    ("D", "2026-06-19", "21:00 UTC-7", "UEFA Path C winner", "Paraguay"),
+    ("D", "2026-06-25", "19:00 UTC-7", "UEFA Path C winner", "USA"),
+    ("D", "2026-06-25", "19:00 UTC-7", "Paraguay", "Australia"),
+    ("E", "2026-06-14", "12:00 UTC-5", "Germany", "Curacao"),
+    ("E", "2026-06-14", "19:00 UTC-4", "Ivory Coast", "Ecuador"),
+    ("E", "2026-06-20", "16:00 UTC-4", "Germany", "Ivory Coast"),
+    ("E", "2026-06-20", "19:00 UTC-5", "Ecuador", "Curacao"),
+    ("E", "2026-06-25", "16:00 UTC-4", "Curacao", "Ivory Coast"),
+    ("E", "2026-06-25", "16:00 UTC-4", "Ecuador", "Germany"),
+    ("F", "2026-06-14", "15:00 UTC-5", "Netherlands", "Japan"),
+    ("F", "2026-06-14", "20:00 UTC-6", "UEFA Path B winner", "Tunisia"),
+    ("F", "2026-06-20", "12:00 UTC-5", "Netherlands", "UEFA Path B winner"),
+    ("F", "2026-06-20", "22:00 UTC-6", "Tunisia", "Japan"),
+    ("F", "2026-06-25", "18:00 UTC-5", "Japan", "UEFA Path B winner"),
+    ("F", "2026-06-25", "18:00 UTC-5", "Tunisia", "Netherlands"),
+    ("G", "2026-06-15", "12:00 UTC-7", "Belgium", "Egypt"),
+    ("G", "2026-06-15", "18:00 UTC-7", "Iran", "New Zealand"),
+    ("G", "2026-06-21", "12:00 UTC-7", "Belgium", "Iran"),
+    ("G", "2026-06-21", "18:00 UTC-7", "New Zealand", "Egypt"),
+    ("G", "2026-06-26", "20:00 UTC-7", "Egypt", "Iran"),
+    ("G", "2026-06-26", "20:00 UTC-7", "New Zealand", "Belgium"),
+    ("H", "2026-06-15", "12:00 UTC-4", "Spain", "Cape Verde"),
+    ("H", "2026-06-15", "18:00 UTC-4", "Saudi Arabia", "Uruguay"),
+    ("H", "2026-06-21", "12:00 UTC-4", "Spain", "Saudi Arabia"),
+    ("H", "2026-06-21", "18:00 UTC-4", "Uruguay", "Cape Verde"),
+    ("H", "2026-06-26", "19:00 UTC-5", "Cape Verde", "Saudi Arabia"),
+    ("H", "2026-06-26", "18:00 UTC-6", "Uruguay", "Spain"),
+    ("I", "2026-06-16", "15:00 UTC-4", "France", "Senegal"),
+    ("I", "2026-06-16", "18:00 UTC-4", "IC Path 2 winner", "Norway"),
+    ("I", "2026-06-22", "17:00 UTC-4", "France", "IC Path 2 winner"),
+    ("I", "2026-06-22", "20:00 UTC-4", "Norway", "Senegal"),
+    ("I", "2026-06-26", "15:00 UTC-4", "Norway", "France"),
+    ("I", "2026-06-26", "15:00 UTC-4", "Senegal", "IC Path 2 winner"),
+    ("J", "2026-06-16", "20:00 UTC-5", "Argentina", "Algeria"),
+    ("J", "2026-06-16", "21:00 UTC-7", "Austria", "Jordan"),
+    ("J", "2026-06-22", "12:00 UTC-5", "Argentina", "Austria"),
+    ("J", "2026-06-22", "20:00 UTC-7", "Jordan", "Algeria"),
+    ("J", "2026-06-27", "21:00 UTC-5", "Algeria", "Austria"),
+    ("J", "2026-06-27", "21:00 UTC-5", "Jordan", "Argentina"),
+    ("K", "2026-06-17", "12:00 UTC-5", "Portugal", "IC Path 1 winner"),
+    ("K", "2026-06-17", "20:00 UTC-6", "Uzbekistan", "Colombia"),
+    ("K", "2026-06-23", "12:00 UTC-5", "Portugal", "Uzbekistan"),
+    ("K", "2026-06-23", "20:00 UTC-6", "Colombia", "IC Path 1 winner"),
+    ("K", "2026-06-27", "19:30 UTC-4", "Colombia", "Portugal"),
+    ("K", "2026-06-27", "19:30 UTC-4", "IC Path 1 winner", "Uzbekistan"),
+    ("L", "2026-06-17", "15:00 UTC-5", "England", "Croatia"),
+    ("L", "2026-06-17", "19:00 UTC-4", "Ghana", "Panama"),
+    ("L", "2026-06-23", "16:00 UTC-4", "England", "Ghana"),
+    ("L", "2026-06-23", "19:00 UTC-4", "Panama", "Croatia"),
+    ("L", "2026-06-27", "17:00 UTC-4", "Panama", "England"),
+    ("L", "2026-06-27", "17:00 UTC-4", "Croatia", "Ghana"),
+]
+
+# knockout slot -> (date, "HH:MM UTC±X"). Slot numbers match R32_DEF/R16_DEF/etc.
+_KO_DATE = {
+    73: ("2026-06-28", "12:00 UTC-7"), 74: ("2026-06-29", "16:30 UTC-4"),
+    75: ("2026-06-29", "19:00 UTC-6"), 76: ("2026-06-29", "12:00 UTC-5"),
+    77: ("2026-06-30", "17:00 UTC-4"), 78: ("2026-06-30", "12:00 UTC-5"),
+    79: ("2026-06-30", "19:00 UTC-6"), 80: ("2026-07-01", "12:00 UTC-4"),
+    81: ("2026-07-01", "17:00 UTC-7"), 82: ("2026-07-01", "13:00 UTC-7"),
+    83: ("2026-07-02", "19:00 UTC-4"), 84: ("2026-07-02", "12:00 UTC-7"),
+    85: ("2026-07-02", "20:00 UTC-7"), 86: ("2026-07-03", "18:00 UTC-4"),
+    87: ("2026-07-03", "20:30 UTC-5"), 88: ("2026-07-03", "13:00 UTC-5"),
+    89: ("2026-07-04", "17:00 UTC-4"), 90: ("2026-07-04", "12:00 UTC-5"),
+    91: ("2026-07-05", "16:00 UTC-4"), 92: ("2026-07-05", "18:00 UTC-6"),
+    93: ("2026-07-06", "14:00 UTC-5"), 94: ("2026-07-06", "17:00 UTC-7"),
+    95: ("2026-07-07", "12:00 UTC-4"), 96: ("2026-07-07", "13:00 UTC-7"),
+    97: ("2026-07-09", "16:00 UTC-4"), 98: ("2026-07-10", "12:00 UTC-7"),
+    99: ("2026-07-11", "17:00 UTC-4"), 100: ("2026-07-11", "20:00 UTC-5"),
+    101: ("2026-07-14", "14:00 UTC-5"), 102: ("2026-07-15", "15:00 UTC-4"),
+    103: ("2026-07-18", "17:00 UTC-4"), 104: ("2026-07-19", "15:00 UTC-4"),
+}
+
+def _utc(date_str, time_str):
+    hm, off = time_str.rsplit(" ", 1)
+    h, m = map(int, hm.split(":"))
+    offh = int(off.replace("UTC", ""))
+    naive = dt.datetime.fromisoformat(date_str) + dt.timedelta(hours=h, minutes=m)
+    return (naive - dt.timedelta(hours=offh)).replace(tzinfo=dt.timezone.utc)
+
+def _sched_team(raw):
+    return _PLAYOFF.get(raw) or canon(raw)
+
 def demo_matches(seed=26):
-    """Demo mode: one full Elo-driven simulation of all 104 matches, so every
-    tab renders a completed tournament (groups, bracket, champion, standings).
-    Deterministic for a given seed."""
+    """Demo mode: one full Elo-driven simulation played on the REAL WC2026
+    fixture calendar. The schedule (dates + matchups) is fixed; only the
+    scorelines change with the seed."""
     import random as _r
     rng = _r.Random(seed)
     out = []
@@ -483,15 +594,14 @@ def demo_matches(seed=26):
     def _exp(a, b):
         return 1 / (1 + 10 ** ((ELO[b] - ELO[a]) / 400))
 
-    def mk(a, b, sa, sb, day, hour, rnd, group=None):
-        utc = dt.datetime(day.year, day.month, day.day, hour, 0, tzinfo=dt.timezone.utc)
+    def mk(a, b, sa, sb, utc, rnd, group=None):
         return {"id": f"demo-{rnd}-{a}-{b}", "utc": utc,
                 "local_date": utc.astimezone(ET).date(),
                 "a": a, "b": b, "raw_a": a, "raw_b": b, "known": True,
                 "sa": sa, "sb": sb, "state": "post", "completed": True,
                 "clock": "FT", "round": rnd, "group": group,
                 "winner": a if sa > sb else (b if sb > sa else None),
-                "venue": "Demo Stadium"}
+                "venue": "Demo"}
 
     def group_score(a, b):
         ea = _exp(a, b)
@@ -500,23 +610,17 @@ def demo_matches(seed=26):
         if rng.random() < pdraw:
             g = rng.choice([0, 1, 1, 2])
             return g, g
-        win_a = rng.random() < ea
         wg = rng.choice([1, 1, 2, 2, 2, 3, 3, 4])
         lg = rng.randint(0, min(wg - 1, 2))
-        return (wg, lg) if win_a else (lg, wg)
+        return (wg, lg) if rng.random() < ea else (lg, wg)
 
-    # group stage: 72 games across June 11-27
-    for gi, (g, tm) in enumerate(GROUPS.items()):
-        t1, t2, t3, t4 = tm
-        mds = [[(t1, t2), (t3, t4)], [(t1, t3), (t2, t4)], [(t1, t4), (t2, t3)]]
-        days = [gi % 6, 6 + gi % 6, 12 + gi % 5]
-        for pairs, dy in zip(mds, days):
-            for k, (a, b) in enumerate(pairs):
-                sa, sb = group_score(a, b)
-                out.append(mk(a, b, sa, sb, START + dt.timedelta(days=dy),
-                              16 + 3 * k, "GROUP", g))
+    # group stage on the real calendar
+    for g, date, time, t1raw, t2raw in _GROUP_FIXTURES:
+        a, b = _sched_team(t1raw), _sched_team(t2raw)
+        sa, sb = group_score(a, b)
+        out.append(mk(a, b, sa, sb, _utc(date, time), "GROUP", g))
 
-    # finalize groups exactly the way the live app would, then play the bracket
+    # finalize groups, then play the bracket on the real KO dates
     st = build_state(out)
     gr = st["group_rank"]
     amap = assign_thirds(st["top8_groups"])
@@ -528,31 +632,29 @@ def demo_matches(seed=26):
             return gr[spec[1]][1]
         return gr[amap[spec[1]]][2]
 
-    def ko(a, b, rnd, day, hour):
+    def ko(a, b, rnd, slot):
         win = a if rng.random() < _exp(a, b) else b
         wg = rng.choice([1, 2, 2, 3])
         lg = rng.randint(0, wg - 1)
         sa, sb = (wg, lg) if win == a else (lg, wg)
-        out.append(mk(a, b, sa, sb, day, hour, rnd))
+        d, t = _KO_DATE[slot]
+        out.append(mk(a, b, sa, sb, _utc(d, t), rnd))
         return win
 
     w = {}
-    for i, (slot, A, B) in enumerate(R32_DEF):
-        day = dt.date(2026, 6, 28) + dt.timedelta(days=(i * 6) // 16)
-        w[slot] = ko(resolve(A), resolve(B), "R32", day, 16 + 3 * (i % 3))
-    for i, (slot, fa, fb) in enumerate(R16_DEF):
-        w[slot] = ko(w[fa], w[fb], "R16",
-                     dt.date(2026, 7, 4) + dt.timedelta(days=i // 2), 17 + 3 * (i % 2))
-    for i, (slot, fa, fb) in enumerate(QF_DEF):
-        w[slot] = ko(w[fa], w[fb], "QF",
-                     dt.date(2026, 7, 9) + dt.timedelta(days=(i * 3) // 4), 18 + 2 * (i % 2))
+    for slot, A, B in R32_DEF:
+        w[slot] = ko(resolve(A), resolve(B), "R32", slot)
+    for slot, fa, fb in R16_DEF:
+        w[slot] = ko(w[fa], w[fb], "R16", slot)
+    for slot, fa, fb in QF_DEF:
+        w[slot] = ko(w[fa], w[fb], "QF", slot)
     losers = {}
-    for i, (slot, fa, fb) in enumerate(SF_DEF):
+    for slot, fa, fb in SF_DEF:
         a, b = w[fa], w[fb]
-        w[slot] = ko(a, b, "SF", dt.date(2026, 7, 14) + dt.timedelta(days=i), 19)
+        w[slot] = ko(a, b, "SF", slot)
         losers[slot] = b if w[slot] == a else a
-    ko(losers[101], losers[102], "3P", dt.date(2026, 7, 18), 19)
-    ko(w[101], w[102], "F", dt.date(2026, 7, 19), 19)
+    ko(losers[101], losers[102], "3P", 103)
+    ko(w[101], w[102], "F", 104)
     return sorted(out, key=lambda m: m["utc"])
 
 
