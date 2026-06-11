@@ -1,1 +1,2 @@
-streamlit
+streamlit>=1.36
+streamlit-autorefresh>=1.0.1
